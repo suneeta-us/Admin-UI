@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADMIN UI</title>
+    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css'> 
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>    
+	
+	<script>
+		async function getUsers() {
+			let url = 'https://geektrust.s3-ap-southeast-1.amazonaws.com/adminui-problem/members.json';
+			try {
+				let res = await fetch(url);
+				return await res.json();
+			} catch (error) {
+				console.log(error);
+			}
+		}
+		async function renderUsers() {
+		let users = await getUsers();
+		let html = '<table><tr><th><input type="checkbox" class="all"></th><th>Name</th><th>Email</th><th>Role</th><th  colspan=2>Actions</th>'
+		
+		users.map(user => {
+			let htmlSegment = `<tr id="${user.id}">
+								<td><input type="checkbox" name="check"></td>
+								<td>${user.name}</td>
+								<td>${user.email}</td>
+								<td>${user.role}</td>
+								<td><i class='fa fa-edit'></i></td>
+								<td><i class='fa fa-trash' style='color:red'></i></td>
+							</tr>`;
+
+			html += htmlSegment;
+		});
+		html += '</table>'
+
+		let container = document.querySelector('.dynamicTable');
+		container.innerHTML = html;
+	}
+
+	renderUsers();
+	
+	function removeRow(element){
+		element.parentElement.removeChild(element);
+	}
+	
+	function deleteSelectedCheckbox(){
+		var selectedCheckbox = document.getElementsByName('check');
+		for(var i = 0; i < selectedCheckbox.length; i++){
+			if(selectedCheckbox[i].checked)
+			{
+				removeRow(selectedCheckbox[i]);    
+			}
+		} 
+		
+	}
+	</script>
+	<style>
+		.container{
+			padding:10px;
+			margin: auto; 
+			width: 80%;
+		}
+		input[type=text] {
+			width: 80%;
+			margin: auto; 
+			display:block;
+			padding:10px;	
+			border: 1px solid #e1e1e1;
+		}
+		table {
+			border-collapse: collapse;
+			width: 80%;
+			align-self: center;
+			margin: 0 auto;
+		}
+
+		tr {
+			border-bottom: 1px solid #e1e1e1;
+		}
+
+		th {
+			text-align: left;  
+			padding:10px;			
+		}
+		td {
+			padding: 10px;
+		}
+		
+		.button{
+		  border: none;
+		  border-radius: 15px;
+		  background-color: #e97171fa;
+		  padding:10px;
+		  color:white;
+		}
+		.paginationDiv{
+			padding-top:20px;
+		}
+	</style>
+</head>
+<body>
+    <div class="container">
+		<input type="text" id="searchUser" placeholder="Search by name, email or role"/>
+		<div class="dynamicTable"></div>	
+		<div class="paginationDiv">
+			<button class="button" onclick="deleteSelectedCheckbox();">Delete Selected</button>
+		</div>
+	</div>
+</body>
+</html>
